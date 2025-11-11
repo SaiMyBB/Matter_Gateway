@@ -1,0 +1,10 @@
+[
+    {"type": "OnOffLamp", "name": "LivingRoomLamp"},
+    {"type": "Dimmer", "name": "BedroomDimmer"},
+    {"type": "Thermostat", "name": "MainThermostat"},
+    {"type": "TemperatureSensor", "name": "RoomTempSensor"},
+    {"type": "HumiditySensor", "name": "HomeHumidity"},
+    {"type": "LightSensor", "name": "WindowLight"},
+    {"type": "LeakSensor", "name": "PipeLeak"}
+  ]
+  

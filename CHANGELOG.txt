@@ -1,0 +1,172 @@
+🧱 Project Overview
+
+The Matter Gateway Project implements a modular, Python-based gateway framework designed for smart home device integration.
+It provides WebSocket-based real-time communication, JSON persistence, user authentication, and a web dashboard — and is architected for Larnitech API2 compatibility.
+
+🧾 Milestone 1 – Core Architecture Alignment (Revised per Client Feedback)
+
+Date: October 2025
+Status: ✅ Completed and Verified
+
+🔹 Overview
+
+This milestone records updates following client feedback.
+The implementation was revised to comply fully with the Larnitech API2 communication model and system architecture.
+
+🔧 Revision Summary
+Area	Original Implementation	Client Requested Change	Result / Implementation
+1. Communication Protocol	REST API (FastAPI /devices routes)	Replace with WebSocket (Larnitech API2)	Implemented FastAPI WebSocket at /ws handling list, get, and set commands. Supports JSON messages and real-time broadcasting.
+2. Connectivity	BLE + mDNS commissioning simulated	Remove BLE/mDNS – use wired LAN only	BLE/mDNS logic removed; gateway operates solely over LAN via WebSocket.
+3. State Persistence	Planned SQLite storage	Replace with JSON-based persistence	Implemented lightweight persistence in core/persistence.py, storing device states in devices_state.json.
+4. Device List & Extensibility	Single static On/Off Lamp	Retain lamp, enable extensibility	Maintained Lamp device and designed base class architecture for future expansion.
+📁 Affected Files
+File	Purpose / Change
+api/websocket_api.py	New WebSocket API replacing REST routes; handles list, get, set.
+core/gateway.py	Integrated JSON persistence and broadcast logic.
+core/persistence.py	Added new lightweight persistence layer.
+devices/onoff_lamp.py	Integrated with new gateway state update model.
+run_gateway.py	Updated entry point for WebSocket startup.
+devices_state.json	Auto-generated persistent storage file.
+README.md	Updated with WebSocket usage and testing instructions.
+🧪 Testing & Verification
+
+✔ Verified WebSocket connectivity using websocat and Python client.
+✔ Confirmed real-time updates and broadcasting between clients.
+✔ Confirmed automatic load/restore from devices_state.json.
+✔ BLE/mDNS completely removed — gateway functions in LAN mode.
+
+✅ Milestone 1 Status
+
+All requested revisions implemented and tested.
+Gateway is stable and compliant with Larnitech API2 design principles.
+
+🧾 Milestone 2 – Core Devices Implementation
+
+Date: November 2025
+Status: ✅ Completed and Tested
+
+🔹 Overview
+
+Added foundational device types to extend the Matter Gateway’s simulation capabilities — including environmental control and monitoring devices.
+
+🔧 Summary of Changes
+
+Added devices/thermostat.py with attributes: mode, setpoint
+
+Added devices/temperature_sensor.py with async auto-update (10 s interval)
+
+Updated api/websocket_api.py to safely start sensor tasks during FastAPI startup
+
+Updated README.md with WebSocket examples for new devices
+
+🧪 Testing & Verification
+
+✔ All devices respond to get and set commands via WebSocket
+✔ Confirmed persistence of device states between restarts
+✔ Verified real-time updates from temperature sensor
+✔ No event loop or startup timing errors
+
+✅ Milestone 2 Status
+
+COMPLETED AND VERIFIED — Gateway supports multiple device classes and asynchronous background updates.
+
+🧾 Milestone 3 – Advanced Sensors + Web Dashboard
+
+Date: November 2025
+Status: ✅ Completed and Delivered
+
+🔹 Overview
+
+Expanded Matter Gateway functionality with additional smart sensors, dynamic configuration, and a live Web Dashboard for real-time device monitoring and control.
+
+🔧 Summary of Changes
+
+Added:
+
+HumiditySensor (20–90% auto-updates every 15 s)
+
+LightSensor (0–1000 lux auto-updates every 12 s)
+
+LeakSensor (Boolean toggle every 20 s)
+
+Created config/devices_config.json for dynamic device registration
+
+Implemented automatic startup for all sensor update loops
+
+Developed index.html + dashboard.js web dashboard
+
+Added style.css for responsive layout
+
+Enhanced persistence, error handling, and broadcast stability
+
+🧪 Testing & Verification
+
+✔ Dynamic device loading from configuration file
+✔ All sensors broadcast live updates via WebSocket
+✔ Dashboard shows real-time data for each device
+✔ Persistent states confirmed in devices_state.json
+✔ No runtime or event loop issues
+
+✅ Milestone 3 Status
+
+COMPLETED — Stable and Feature-Rich Build
+Ready for client integration and authentication layer development.
+
+🧾 Milestone 4 – Secure Authentication + Real-Time Dashboard
+
+Date: November 2025
+Status: ✅ Completed and Verified
+
+🔹 Overview
+
+Milestone 4 adds complete user authentication, email verification, and session-based dashboard protection.
+The system now supports secure user access, verified via email before login, and manages JWT-secured WebSocket connections for the live dashboard.
+
+🔧 Summary of Changes
+Area	Description
+User Authentication	Added registration, login, and logout functionality via FastAPI forms.
+Email Verification	Integrated SMTP-based verification using aiosmtplib (Gmail-compatible).
+JWT Tokens	Added secure access tokens (core/token_utils.py) for session validation.
+Session Middleware	Implemented session-based user handling with cookie support.
+WebSocket Security	Restricted /ws access to verified, logged-in users.
+Frontend Integration	Created /register, /login, /logout pages; dashboard auto-loads post-login.
+Dashboard Update	Added logout button, connection status indicator, and responsive cards.
+📁 Affected Files
+File	Description
+api/auth.py	Handles registration, login, logout, and email verification routes.
+core/email_utils.py	Manages token generation and async email sending.
+core/token_utils.py	Generates and validates JWT tokens.
+api/websocket_api.py	Now requires JWT token for WebSocket authentication.
+api/web_ui/*	Added login.html, register.html, updated index.html.
+run_gateway.py	Improved startup logic with port fallback and logging.
+requirements.txt	Updated dependencies (aiosmtplib, bcrypt, uvicorn[standard]).
+🧪 Testing & Verification
+
+✔ Registration → verification → login flow tested end-to-end.
+✔ Email verification link validated (SMTP + console fallback).
+✔ Login sessions maintained via secure cookies.
+✔ WebSocket connects only after verified login.
+✔ Dashboard shows live device states and supports toggles/sliders.
+✔ Logout clears sessions and tokens.
+
+✅ Milestone 4 Status
+
+COMPLETED AND VERIFIED
+Gateway is now secure, modular, and user-ready — fully authenticated with live WebSocket dashboard integration.
+Prepares system for Milestone 5: Larnitech API2 integration.
+
+🧱 Next Milestone (5 – Planned: Larnitech API Integration)
+
+Goal: Connect Matter Gateway to the real Larnitech environment.
+
+Planned Features:
+
+Add core/larnitech_client.py for REST communication (/device/list, /device/get, /device/set)
+
+Support real-time Larnitech /ws events
+
+Replace virtual devices with API-backed real devices
+
+Two-way synchronization between Matter Gateway and Larnitech controller
+
+Secure config (.env) for token, IP, and credentials

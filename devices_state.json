@@ -1,0 +1,21 @@
+{
+  "BedroomDimmer": {
+    "power": true,
+    "brightness": 60
+  },
+  "RoomTempSensor": {
+    "temperature": 27.4
+  },
+  "WindowLight": {
+    "lux": 68.1
+  },
+  "HomeHumidity": {
+    "humidity": 27.6
+  },
+  "PipeLeak": {
+    "leak": true
+  },
+  "LivingRoomLamp": {
+    "power": true
+  }
+}

@@ -64,3 +64,92 @@ curl http://localhost:8000/devices
 curl -X POST "http://localhost:8000/devices/LivingRoomLamp/power?value=true"
 curl http://localhost:8000/devices/LivingRoomLamp
 curl -X POST "http://localhost:8000/devices/LivingRoomLamp/power?value=false"
+
+
+
+# Matter Gateway — Milestone 4  
+### 🔹 Secure Authentication + Real-Time WebSocket Dashboard  
+
+---
+
+## 🧠 Overview
+
+This project implements a **Python-based Matter Gateway framework** that simulates smart-home devices, provides a **real-time dashboard**, and integrates **user authentication with email verification**.  
+
+This version (Milestone 4) completes the full authentication system and live WebSocket control of virtual devices.  
+It lays the groundwork for **Milestone 5**, which will connect directly to the client’s **Larnitech API2** system.
+
+---
+
+## ⚙️ Features
+
+| Area | Description |
+|------|--------------|
+| **Authentication** | User registration, login, logout with JWT + session cookies |
+| **Email Verification** | Async SMTP verification link using `aiosmtplib` |
+| **WebSocket API** | Live device updates using FastAPI’s WebSocket support |
+| **Dashboard UI** | Clean HTML + JS interface for real-time control |
+| **Virtual Devices** | On/Off Lamp, Dimmer, Thermostat, Temperature, Humidity, Light, Leak Sensors |
+| **Auto-Update Sensors** | Periodic updates for environmental devices |
+| **Persistence Scaffold** | JSON-based storage and state recovery |
+| **Extensible Architecture** | Ready to integrate with real Matter or Larnitech APIs |
+
+---
+
+## 📂 Project Structure
+
+Matter_Gateway/
+├── api/
+│ ├── auth.py
+│ ├── websocket_api.py
+│ └── web_ui/
+│ ├── index.html
+│ ├── login.html
+│ ├── register.html
+│ ├── dashboard.js
+│ └── style.css
+│
+├── core/
+│ ├── gateway.py
+│ ├── device_base.py
+│ ├── token_utils.py
+│ ├── email_utils.py
+│ ├── security.py
+│ └── persistence.py
+│
+├── devices/
+│ ├── onoff_lamp.py
+│ ├── dimmer.py
+│ ├── thermostat.py
+│ ├── temperature_sensor.py
+│ ├── humidity_sensor.py
+│ ├── light_sensor.py
+│ └── leak_sensor.py
+│
+├── config/
+│ └── devices_config.json
+│
+├── data/
+│ └── users.json
+│
+├── run_gateway.py
+├── requirements.txt
+├── README.md
+└── CHANGELOG.txt
+
+
+
+---
+
+## 🧰 Setup Instructions
+
+### 1️⃣ Create and activate virtual environment
+```bash
+python -m venv venv
+.\venv\Scripts\Activate.ps1       # PowerShell on Windows
+
+2️⃣ Install dependencies
+pip install -r requirements.txt
+
+If WebSockets are not detected, install the full set:
+pip install "uvicorn[standard]" websockets

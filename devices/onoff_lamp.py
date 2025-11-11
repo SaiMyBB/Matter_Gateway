@@ -1,10 +1,5 @@
-import sys, os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# devices/onoff_lamp.py
 from core.device_base import BaseDevice
-
-
-
-
 
 class OnOffLamp(BaseDevice):
     def __init__(self, name="OnOffLamp"):

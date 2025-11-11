@@ -1,0 +1,20 @@
+[
+  {
+    "username": "Admin",
+    "email": "saireddykancharkuntla@gmail.com",
+    "password_hash": "b6a8de684f8b865826b65e62a5957f4b01770c4f814b006ca085947043ea691f",
+    "verified": false
+  },
+  {
+    "username": "SaiReddy",
+    "email": "sainarsimhareddy11@gmail.com",
+    "password_hash": "b6a8de684f8b865826b65e62a5957f4b01770c4f814b006ca085947043ea691f",
+    "verified": false
+  },
+  {
+    "username": "Sai_Test",
+    "email": "Saireddykancharkuntla@gmail.com",
+    "password_hash": "b6a8de684f8b865826b65e62a5957f4b01770c4f814b006ca085947043ea691f",
+    "verified": true
+  }
+]
