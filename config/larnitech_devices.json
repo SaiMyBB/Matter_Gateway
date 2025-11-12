@@ -1,0 +1,6 @@
+[
+    {"id": "lamp1", "name": "LivingRoomLamp", "type": "onoff", "value": false},
+    {"id": "dimmer1", "name": "BedroomDimmer", "type": "dimmer", "value": 50},
+    {"id": "temp1", "name": "RoomTempSensor", "type": "temperature", "value": 25.5}
+]
+  

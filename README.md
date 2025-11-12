@@ -1,155 +1,54 @@
-# Matter Gateway — Milestone 1
+# Matter Gateway — Full Delivery (Milestone 7)
 
-### 🔹 Overview
-This repository contains the **base Matter Gateway implementation** and the **first virtual device (On/Off Lamp)**.  
-It establishes the foundational architecture for simulating Matter-compliant smart devices that can be controlled via REST APIs.
+## Overview
+This repository contains the Matter Gateway (WebSocket API), Web Dashboard, Larnitech integration helpers, HomeKit bridge, and a Matter bridge prototype. The aim is to provide:
+- Local WebSocket gateway + dashboard for virtual devices
+- Persistent device state (JSON)
+- Larnitech API client and optional live listener
+- HomeKit & Matter bridge prototypes for mobile integration (iOS / Android)
+- Full instructions to build and run in macOS / Linux environments
 
----
-
-## Milestone 1 Features
-
-| Component | Description |
-|------------|-------------|
-| **Base Gateway** | Core framework to register, manage, and interact with virtual devices. |
-| **On/Off Lamp** | First functional virtual device supporting power ON/OFF control. |
-| **REST API** | FastAPI-powered endpoints for listing, reading, and updating device states. |
-| **Commissionable Bridge (Scaffold)** | Gateway acts as a bridge exposing endpoints for future Matter integration. |
-| **Persistence Scaffold** | Placeholder for saving/restoring device state (coming in Milestone 3). |
+> NOTE: For a fully production-capable Matter bridge, the CHIP SDK Python bindings from `connectedhomeip` must be built and installed. This README covers both quick-demo (shims) and correct production paths.
 
 ---
 
-## Project Structure
-Matter_Gateway/
-├── api/
-│ ├── init.py
-│ └── rest_api.py
-├── core/
-│ ├── init.py
-│ ├── device_base.py
-│ ├── gateway.py
-│ └── persistence.py
-├── devices/
-│ ├── init.py
-│ └── onoff_lamp.py
-├── requirements.txt
-└── run_gateway.py
-
-
+## Quick status (what’s done)
+- WebSocket Gateway & Dashboard — ✅
+- Devices: OnOff Lamp, Dimmer, Thermostat, Temperature/Humidity/Light/Leak sensors — ✅
+- Persistence scaffold (JSON) — ✅
+- Larnitech client and WS listener (prototype) — ✅
+- Web Dashboard (login + WS auth + live UI) — ✅
+- HomeKit bridge prototype (`hap_bridge.py`) — ✅ (works with HAP Python)
+- Matter bridge prototype (`matter_bridge.py`) — ✅ (works in demo mode with shims). Full Matter control requires CHIP Python bindings.
 
 ---
 
-## Setup & Run Instructions
+## Prerequisites
+- macOS / Linux
+- Python 3.12 (recommended for CHIP builds) — your project venv can be Python 3.13 for gateway, but CHIP build requires ≤ 3.12.
+- Git, curl, build tools (cmake, ninja) if you plan to build connectedhomeip
+- Optional: Home app (iOS) or Google Home (Android) to test HomeKit/Matter pairing.
 
-### Create Virtual Environment
+---
+
+## Files delivered
+- `run_gateway.py` — starts WebSocket gateway (FastAPI / Uvicorn)
+- `api/websocket_api.py` — WebSocket API and dashboard static mounts
+- `api/web_ui/` — index.html, dashboard.js, style.css, login/register UI
+- `core/` — gateway, persistence, larnitech_client, larnitech_ws_listener
+- `devices/` — virtual device classes + sensors
+- `hap_bridge.py` — HomeKit bridge (HAP-python)
+- `matter_bridge.py` — Matter bridge prototype (uses python-matter-server / shims)
+- `config/devices_config.json` — sample device list
+- `data/devices_state.json` — runtime device state (auto created)
+- `requirements.txt`, `setup.sh`, `run_matter_gateway.sh`, `.env.example`
+- `verify_matter_env.py` (checks environment readiness)
+
+---
+
+## Quick demo (fast path, uses shims if full CHIP not available)
+1. Create venv and install Python deps
 ```bash
-python -m venv venv
-source venv/bin/activate        # On Windows: venv\Scripts\activate
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
-
-# To the run the gateway
-python run_gateway.py
-
---> Server starts at:
- http://localhost:8000
-
---> REST API Endpoints
-Method	Endpoint	Description
-GET	/devices	List all registered virtual devices
-GET	/devices/{name}	Read device state
-POST	/devices/{name}/{attribute}?value={bool}	Update device state
-
-
---> Testing the On/Off Lamp
-curl http://localhost:8000/devices
-curl -X POST "http://localhost:8000/devices/LivingRoomLamp/power?value=true"
-curl http://localhost:8000/devices/LivingRoomLamp
-curl -X POST "http://localhost:8000/devices/LivingRoomLamp/power?value=false"
-
-
-
-# Matter Gateway — Milestone 4  
-### 🔹 Secure Authentication + Real-Time WebSocket Dashboard  
-
----
-
-## 🧠 Overview
-
-This project implements a **Python-based Matter Gateway framework** that simulates smart-home devices, provides a **real-time dashboard**, and integrates **user authentication with email verification**.  
-
-This version (Milestone 4) completes the full authentication system and live WebSocket control of virtual devices.  
-It lays the groundwork for **Milestone 5**, which will connect directly to the client’s **Larnitech API2** system.
-
----
-
-## ⚙️ Features
-
-| Area | Description |
-|------|--------------|
-| **Authentication** | User registration, login, logout with JWT + session cookies |
-| **Email Verification** | Async SMTP verification link using `aiosmtplib` |
-| **WebSocket API** | Live device updates using FastAPI’s WebSocket support |
-| **Dashboard UI** | Clean HTML + JS interface for real-time control |
-| **Virtual Devices** | On/Off Lamp, Dimmer, Thermostat, Temperature, Humidity, Light, Leak Sensors |
-| **Auto-Update Sensors** | Periodic updates for environmental devices |
-| **Persistence Scaffold** | JSON-based storage and state recovery |
-| **Extensible Architecture** | Ready to integrate with real Matter or Larnitech APIs |
-
----
-
-## 📂 Project Structure
-
-Matter_Gateway/
-├── api/
-│ ├── auth.py
-│ ├── websocket_api.py
-│ └── web_ui/
-│ ├── index.html
-│ ├── login.html
-│ ├── register.html
-│ ├── dashboard.js
-│ └── style.css
-│
-├── core/
-│ ├── gateway.py
-│ ├── device_base.py
-│ ├── token_utils.py
-│ ├── email_utils.py
-│ ├── security.py
-│ └── persistence.py
-│
-├── devices/
-│ ├── onoff_lamp.py
-│ ├── dimmer.py
-│ ├── thermostat.py
-│ ├── temperature_sensor.py
-│ ├── humidity_sensor.py
-│ ├── light_sensor.py
-│ └── leak_sensor.py
-│
-├── config/
-│ └── devices_config.json
-│
-├── data/
-│ └── users.json
-│
-├── run_gateway.py
-├── requirements.txt
-├── README.md
-└── CHANGELOG.txt
-
-
-
----
-
-## 🧰 Setup Instructions
-
-### 1️⃣ Create and activate virtual environment
-```bash
-python -m venv venv
-.\venv\Scripts\Activate.ps1       # PowerShell on Windows
-
-2️⃣ Install dependencies
-pip install -r requirements.txt
-
-If WebSockets are not detected, install the full set:
-pip install "uvicorn[standard]" websockets

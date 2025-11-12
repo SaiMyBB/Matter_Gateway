@@ -170,3 +170,9 @@ Replace virtual devices with API-backed real devices
 Two-way synchronization between Matter Gateway and Larnitech controller
 
 Secure config (.env) for token, IP, and credentials
+
+✅ Milestone 5 Status
+
+Added .env.example for environment configuration (Larnitech cloud, WS listener, HomeKit bridge).
+
+Ensures client can easily configure API token and system parameters before startup.
