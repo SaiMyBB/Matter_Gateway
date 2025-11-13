@@ -1,4 +1,12 @@
-/* style.css - clean modern layout for Matter Gateway */
+/* ==========================================================
+   Matter Gateway Web UI — Clean Modern Dashboard Layout
+   -------------------------------------------------------
+   Updated for:
+   - Add Device Modal (Matter + HomeKit QR)
+   - Fully responsive UI
+   - Improved buttons, spacing, typography
+   - More polished modal + animations
+========================================================== */
 
 :root {
   --bg: #f6f8fb;
@@ -9,6 +17,9 @@
   --good: #0b9b34;
   --bad: #e03e3e;
   --bad-hover: #c92d2d;
+  --modal-bg: rgba(0,0,0,0.55);
+  --border: #e6e9ef;
+  --qr-border: #dcdcdc;
 }
 
 * {
@@ -22,16 +33,16 @@ body {
   color: #111;
 }
 
-/* -------------------------------
-   Header & Logout Button
---------------------------------*/
+/* ==========================================================
+   HEADER + LOGOUT + STATUS
+========================================================== */
 header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 18px 28px;
   background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 
 h1 {
@@ -48,16 +59,16 @@ h1 {
 .status.connected {
   background: #e6fbf0;
   color: var(--good);
-  border: 1px solid rgba(11, 155, 52, 0.12);
+  border: 1px solid rgba(11,155,52,0.12);
 }
 
 .status.disconnected {
   background: #fff3f3;
   color: var(--bad);
-  border: 1px solid rgba(224, 62, 62, 0.08);
+  border: 1px solid rgba(224,62,62,0.08);
 }
 
-/* Logout button (top-right) */
+/* Logout button */
 .logout-btn {
   background: var(--bad);
   color: #fff;
@@ -65,36 +76,53 @@ h1 {
   padding: 8px 14px;
   border-radius: 6px;
   font-weight: 600;
-  text-decoration: none;
   cursor: pointer;
-  transition: background 0.2s ease-in-out;
+  transition: background 0.2s;
 }
 
 .logout-btn:hover {
   background: var(--bad-hover);
 }
 
-/* -------------------------------
-   Dashboard Layout
---------------------------------*/
+/* ==========================================================
+   ADD DEVICE BUTTON
+========================================================== */
+.add-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: background 0.2s ease;
+}
+.add-btn:hover {
+  background: var(--accent-hover);
+}
+
+/* ==========================================================
+   MAIN DASHBOARD GRID
+========================================================== */
 main {
   padding: 20px 28px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px,1fr));
   gap: 16px;
 }
 
-/* -------------------------------
-   Device Cards
---------------------------------*/
+/* ==========================================================
+   DEVICE CARDS
+========================================================== */
 .card {
   background: var(--card);
   padding: 14px;
   border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
+  box-shadow: 0 2px 6px rgba(16,24,40,0.04);
   transition: transform 0.15s ease;
 }
 
@@ -111,48 +139,48 @@ main {
   background: #f4f6f9;
   padding: 8px;
   border-radius: 6px;
-  overflow: auto;
-  margin: 8px 0;
+  margin-top: 10px;
   font-size: 13px;
+  overflow-x: auto;
 }
 
 .row {
   display: flex;
-  gap: 8px;
   align-items: center;
+  gap: 8px;
   margin-top: 6px;
 }
 
 .label {
   flex: 1;
-  color: var(--muted);
   font-size: 13px;
+  color: var(--muted);
 }
 
-/* -------------------------------
-   Toggles & Sliders
---------------------------------*/
+/* ==========================================================
+   TOGGLES & SLIDERS
+========================================================== */
 .toggle {
   appearance: none;
   width: 46px;
   height: 26px;
   border-radius: 14px;
-  background: #ddd;
-  position: relative;
+  background: #ccc;
   cursor: pointer;
-  transition: background 0.2s ease;
+  position: relative;
+  transition: background 0.2s;
 }
 
 .toggle:after {
   content: "";
-  position: absolute;
-  left: 3px;
-  top: 3px;
   width: 20px;
   height: 20px;
+  background: white;
   border-radius: 50%;
-  background: #fff;
-  transition: all 0.18s ease;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: left 0.2s;
 }
 
 .toggle.on {
@@ -165,84 +193,131 @@ main {
 
 .slider {
   width: 100%;
-  cursor: pointer;
 }
 
 input[type="number"] {
-  width: 80px;
-  padding: 6px;
+  width: 75px;
+  padding: 5px;
   border-radius: 6px;
-  border: 1px solid #e6e9ef;
+  border: 1px solid var(--border);
 }
 
 select {
   padding: 6px;
   border-radius: 6px;
-  border: 1px solid #e6e9ef;
+  border: 1px solid var(--border);
 }
 
-.small {
-  font-size: 12px;
+/* ==========================================================
+   MODAL (Add Device)
+========================================================== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: var(--modal-bg);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+  transition: opacity 0.25s;
+}
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-content {
+  width: 420px;
+  background: white;
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+  animation: pop 0.25s ease;
+}
+
+@keyframes pop {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.modal-desc {
+  font-size: 14px;
   color: var(--muted);
+  margin-bottom: 14px;
 }
 
-/* -------------------------------
-   Buttons & Misc
---------------------------------*/
-button {
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: none;
+.qr-section {
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.qr-section:last-child {
+  border-bottom: none;
+}
+
+.qr-img {
+  width: 180px;
+  height: 180px;
+  border-radius: 8px;
+  background: #f1f1f1;
+  border: 1px solid var(--qr-border);
+  margin-top: 8px;
+}
+
+.qr-pin {
+  font-size: 14px;
+  margin-top: 6px;
+  color: #222;
+  font-weight: 600;
+}
+
+.qr-error {
+  text-align: center;
+  color: var(--bad);
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: none;
+}
+
+/* Modal buttons */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.accent-btn {
   background: var(--accent);
-  color: #fff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: white;
   cursor: pointer;
-  font-weight: 500;
-  transition: background 0.2s ease;
+  transition: background 0.2s;
 }
-
-button:hover {
+.accent-btn:hover {
   background: var(--accent-hover);
 }
 
+.close-btn {
+  background: #777;
+  padding: 8px 16px;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.close-btn:hover {
+  background: #555;
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
 .footer-note {
-  margin-top: 12px;
   font-size: 12px;
   color: var(--muted);
   text-align: center;
-}
-
-/* -------------------------------
-   Login & Register Pages
---------------------------------*/
-form {
-  background: #fff;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-form h2 {
-  margin-bottom: 20px;
-  text-align: center;
-  color: var(--accent);
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"] {
-  display: block;
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 15px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-}
-
-a {
-  color: var(--accent);
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
 }

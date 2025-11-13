@@ -3,13 +3,17 @@ import asyncio
 import json
 from pathlib import Path
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
-from fastapi.responses import RedirectResponse, FileResponse, HTMLResponse, Response
+from fastapi.responses import RedirectResponse, FileResponse, HTMLResponse, Response, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 import os
 from core.larnitech_ws_listener import larnitech_ws_listener
 
-
+import qrcode
+import io
+import base64
+import secrets
+from io import BytesIO
 
 # Authentication import
 from api import auth
@@ -27,6 +31,10 @@ from devices.temperature_sensor import TemperatureSensor
 from devices.humidity_sensor import HumiditySensor
 from devices.light_sensor import LightSensor
 from devices.leak_sensor import LeakSensor
+
+# Temporary static PINs – replace with live values if needed
+MATTER_PIN = "20202021"
+HOMEKIT_PIN = "031-45-154"
 
 # -------------------------------
 # FastAPI App Initialization
@@ -218,6 +226,77 @@ async def shutdown_event():
             except asyncio.CancelledError:
                 pass
 
+# ===========================================================
+#               PAIRING INFO (Matter + HomeKit)
+# ===========================================================
+
+def _qr_to_data_uri(text: str) -> str:
+    """Generate a QR PNG and return as base64 data URI."""
+    try:
+        qr = qrcode.QRCode(
+            version=2,
+            box_size=6,
+            border=2,
+            error_correction=qrcode.constants.ERROR_CORRECT_M
+        )
+        qr.add_data(text)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+        return f"data:image/png;base64,{b64}"
+    except Exception as e:
+        print(f"[PAIRING] QR generation failed: {e}")
+        return None
+
+
+@app.get("/pairing-info")
+async def pairing_info():
+    """
+    Returns both Matter and HomeKit pairing QR codes + PIN data.
+    Used by frontend to show the 'Add Device' modal.
+    """
+
+    # -----------------------------
+    #  HOMEKIT SETUP
+    # -----------------------------
+    hk_pin = os.getenv("HAP_PIN", "031-45-154")
+    hk_manual_str = f"PIN:{hk_pin}"
+
+    # NOTE: HomeKit official QR requires special payload, but PIN-only works.
+    hk_qr_data = _qr_to_data_uri(hk_manual_str)
+
+    # -----------------------------
+    #  MATTER SETUP
+    # -----------------------------
+    matter_pin = os.getenv("MATTER_PIN", os.getenv("MATTER_SETUP_PIN", "20202021"))
+    bridge_id = os.getenv("MATTER_BRIDGE_ID", "matter-gateway-001")
+
+    # Simple mock Matter payload (works for QR display)
+    matter_payload = f"MTR-{bridge_id}-PIN:{matter_pin}"
+
+    matter_qr_data = _qr_to_data_uri(matter_payload)
+
+    # -----------------------------
+    #  RESPONSE
+    # -----------------------------
+    return {
+        "homekit": {
+            "pin": hk_pin,
+            "manual": hk_manual_str,
+            "qr": hk_qr_data
+        },
+        "matter": {
+            "setup_pin": matter_pin,
+            "payload": matter_payload,
+            "qr": matter_qr_data
+        },
+        "status": "ok"
+    }
+
+
 # -------------------------------
 # Protected Web Dashboard Route
 # -------------------------------
@@ -295,3 +374,32 @@ async def websocket_endpoint(websocket: WebSocket):
                 await manager.send_personal(websocket, {"status": "error", "error": "unknown_cmd"})
     except WebSocketDisconnect:
         await manager.disconnect(websocket)
+
+
+def generate_qr_base64(text: str) -> str:
+    """Generate QR PNG and return base64 string."""
+    qr = qrcode.QRCode(version=2, box_size=6, border=2)
+    qr.add_data(text)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    return base64.b64encode(buffer.getvalue()).decode()
+
+
+@app.get("/qr/matter")
+async def qr_matter():
+    """Matter (Google Home) pairing QR."""
+    qr_text = f"MTR-matter-gateway-001-PIN:{MATTER_PIN}"
+    qr_b64 = generate_qr_base64(qr_text)
+    return JSONResponse({"qr": qr_b64, "pin": MATTER_PIN})
+
+
+@app.get("/qr/homekit")
+async def qr_homekit():
+    """HomeKit pairing QR."""
+    # HomeKit QR format (HAP):
+    qr_text = f"X-HM://0023IS{HOMEKIT_PIN.replace('-', '')}"
+    qr_b64 = generate_qr_base64(qr_text)
+    return JSONResponse({"qr": qr_b64, "pin": HOMEKIT_PIN})

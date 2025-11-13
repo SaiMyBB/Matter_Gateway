@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Matter Gateway — Dashboard</title>
 
-  <!-- Styles & Scripts -->
+  <!-- CSS + JS -->
   <link rel="stylesheet" href="/static/style.css" />
   <script defer src="/static/dashboard.js"></script>
-  <link rel="icon" href="/static/favicon.ico">
+  <link rel="icon" href="/static/favicon.ico" />
 </head>
 
 <body>
@@ -20,14 +20,16 @@
       <h1>Matter Gateway Dashboard</h1>
       <div id="user-info" class="small"></div>
     </div>
+
     <div class="header-right">
+      <button id="add-device-btn" class="add-btn">+ Add Device</button>
       <div id="status" class="status disconnected">Disconnected</div>
       <button class="logout-btn" onclick="confirmLogout()">Logout</button>
     </div>
   </header>
 
   <!-- ===========================
-       MAIN DASHBOARD SECTION
+       MAIN DASHBOARD
   ============================ -->
   <main>
     <section id="controls" class="grid"></section>
@@ -38,23 +40,55 @@
   ============================ -->
   <footer style="text-align:center;padding:10px 0;">
     <small>
-      WebSocket: <span id="ws-url">ws://localhost:8000/ws</span> <br />
+      WebSocket: <span id="ws-url">ws://localhost:8000/ws</span><br />
       &copy; 2025 Matter Gateway — Secure Virtual Device Framework
     </small>
   </footer>
 
   <!-- ===========================
-       LOGOUT CONFIRMATION SCRIPT
+       ADD DEVICE — QR MODAL
+  ============================ -->
+  <div id="qr-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Add Device</h2>
+      <p class="modal-desc">
+        Scan one of the QR codes below to pair your gateway with your smart home app.
+      </p>
+
+      <div class="qr-error"></div>
+
+      <!-- Matter QR -->
+      <div class="qr-section">
+        <h3>🔵 Google Home (Matter)</h3>
+        <img id="matter-qr" class="qr-img" src="" alt="Matter QR Code" />
+        <div id="matter-pin" class="qr-pin"></div>
+      </div>
+
+      <!-- HomeKit QR -->
+      <div class="qr-section">
+        <h3>🍎 Apple Home (HomeKit)</h3>
+        <img id="homekit-qr" class="qr-img" src="" alt="HomeKit QR Code" />
+        <div id="homekit-pin" class="qr-pin"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="refresh-qr-btn" class="accent-btn">Refresh QR</button>
+        <button id="close-qr-btn" class="close-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===========================
+       LOGOUT SCRIPT
   ============================ -->
   <script>
-    // Confirm logout before redirect
     function confirmLogout() {
       if (confirm("Are you sure you want to log out?")) {
         window.location.href = "/logout";
       }
     }
 
-    // Optional: Display username from cookie (if available)
+    // Show username if stored in cookie
     document.addEventListener("DOMContentLoaded", () => {
       const match = document.cookie.match(/session=([^;]+)/);
       const userInfo = document.getElementById("user-info");

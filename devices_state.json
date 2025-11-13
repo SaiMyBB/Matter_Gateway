@@ -4,13 +4,13 @@
     "brightness": 60
   },
   "RoomTempSensor": {
-    "temperature": 28.9
+    "temperature": 20.8
   },
   "WindowLight": {
-    "lux": 782.2
+    "lux": 860.6
   },
   "HomeHumidity": {
-    "humidity": 57.3
+    "humidity": 74.5
   },
   "PipeLeak": {
     "leak": true
